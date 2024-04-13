@@ -1,7 +1,8 @@
-def ReadCandleArray(filename):
+def CandlestickCsvReader(filename):
   """
   Takes in a file path of a txt/csv file containing candle data such as
-  Date, Open, High, Low, Close, Volume, Bid, and Ask in that order.
+  Date, Open, High, Low, Close, Volume, Bid, and Ask in that order. The function 
+  is designed to read in csv files produced by the MQL5 function CandlestickScraper.
   It assumes that the date is in the format "YYYY.M.D H:M:S". It outputs
   a list of dictionaries each of which corresponds to a candle. The numeric
   values are converted from strings (what they are read in as) to floats.
