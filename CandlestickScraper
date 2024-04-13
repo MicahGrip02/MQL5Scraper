@@ -1,0 +1,45 @@
+#include <Trade/Trade.mqh>
+
+CTrade myTradingControlPanel;
+MqlRates HistoricalData[];
+
+int OnInit()
+  {
+   ArraySetAsSeries(HistoricalData, true);
+   
+   int filehandle=FileOpen(Symbol()+ StringSubstr(EnumToString(Period()), 6) +".txt",FILE_READ|FILE_WRITE|FILE_ANSI|FILE_CSV, ",");
+   FileWrite(filehandle, "Date", "Open", "High", "Low", "Close", "Volume", "Bid", "Ask");
+   FileClose(filehandle);
+   return(INIT_SUCCEEDED);
+  }
+
+void OnDeinit(const int reason)
+  {
+  
+  }
+
+void OnTick()
+  {
+      CopyRates(Symbol(), Period(), 0, 2, HistoricalData);
+      static datetime TimeLastCheck;
+      datetime CurrentTimeCandle;
+      CurrentTimeCandle = HistoricalData[0].time;
+      
+      if(CurrentTimeCandle != TimeLastCheck) 
+      {
+         double Ask = SymbolInfoDouble(Symbol(), SYMBOL_ASK);
+         double Bid = SymbolInfoDouble(Symbol(), SYMBOL_BID);
+
+         TimeLastCheck = CurrentTimeCandle;
+         int filehandle = FileOpen(Symbol() + StringSubstr(EnumToString(Period()), 6)+".txt",FILE_READ|FILE_WRITE|FILE_ANSI|FILE_CSV, ",");
+        
+         if(filehandle!=INVALID_HANDLE)
+         {
+            FileSeek(filehandle,0,SEEK_END);
+            FileWrite(filehandle, HistoricalData[1].time, HistoricalData[1].open, HistoricalData[1].high, HistoricalData[1].low, HistoricalData[1].close, HistoricalData[1].real_volume, Bid, Ask);
+            FileClose(filehandle);
+         }
+         else  Print("Operation FileOpen failed, error ",GetLastError());
+     }
+  }
+
