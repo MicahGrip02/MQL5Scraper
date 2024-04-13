@@ -1,0 +1,24 @@
+def ReadCandleArray(filename):
+  """
+  Takes in a file path of a txt/csv file containing candle data such as
+  Date, Open, High, Low, Close, Volume, Bid, and Ask in that order.
+  It assumes that the date is in the format "YYYY.M.D H:M:S". It outputs
+  a list of dictionaries each of which corresponds to a candle. The numeric
+  values are converted from strings (what they are read in as) to floats.
+  """
+  file = open(filename)
+  candle_list = list()
+  candle_reader = csv.DictReader(file)
+  for candle in candle_reader:
+    candle['Date'] = datetime.strptime(candle['Date'], '%Y.%m.%d %H:%M:%S') ##Convert date to a datetime object
+    numeric_keys = ["Open",  "High", "Low", "Close", "Volume", "Bid", "Ask"] ##Create List of keys corresponding to numeric values
+    for key in numeric_keys:
+      candle[key] = float(candle[key]) ##Convert string to float
+
+    ##Add new key value pairs for other price types
+    candle["Median"] = (candle["High"] + candle["Low"] ) / 2
+    candle["Typical"] = (candle["High"] + candle["Low"] + candle["Close"]) / 3
+    candle["Weighted"] = (candle["High"] + candle["Low"] + candle["Open"] + candle["Close"]) / 4
+
+    candle_list.append(candle)
+  return candle_list
