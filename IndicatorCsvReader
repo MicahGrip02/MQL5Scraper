@@ -1,0 +1,22 @@
+def IndicatorCsvReader(filename):
+  """
+  The function IndicatorCsvReader takes as parameters a filename of a csv produced by the 
+  MQL5 file IndicatorScraper. The function returns a list of dicts containing key 
+  value pairs with keys 'Date' and the indicator names. The indicator name keys access 
+  the indicator values for the bar at the date accessed by the 'Date' key. 
+  """
+  file = open(filename)
+  ind_list = list()
+  ind_reader = csv.DictReader(file)
+  for candle in ind_reader:
+    candle['Date'] = datetime.strptime(candle['Date'], '%Y.%m.%d %H:%M:%S') ##Convert date to a datetime object
+    numeric_keys = ["Accumulation Distribution Line", "ADX Main", "ADX Plus DI", "ADX Minus DI", "Average True Range",
+                    "Bollinger Bands Center", "Bollinger Bands Upper", "Bollinger Bands Lower", "Commodity Channel Index",
+                    "Chaikin Oscillator", "Simple Moving Average", "Exponentially Weighted Moving Average",
+                    "Double Exponentially Weighted Moving Average", "Triple Exponentially Weighted Moving Average",
+                    "Momentum Oscillator", "Money Flow Index", "MACD Main Line", "MACD Signal Line", "OBV", "Parabolic SAR",
+                    "RSI", "RVI Main", "RVI Signal", "Moving Std Dev", "Stochastic Osc Main Line", "Stochastic Osc Signal"] ##Create List of keys corresponding to numeric values
+    for key in numeric_keys:
+      candle[key] = float(candle[key]) ##Convert string to float
+    ind_list.append(candle)
+  return ind_list
