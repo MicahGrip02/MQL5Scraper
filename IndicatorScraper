@@ -1,0 +1,175 @@
+#include <Trade/Trade.mqh>
+
+CTrade myTradingControlPanel;
+//handle declarations
+int AD;
+int ADX;
+int ATR;
+int BB;
+int CCI;
+int ChaikinOsc;
+int SMA;
+int EMA;
+int DEMA;
+int TEMA;
+int MOM;
+int MFI;
+int MACD;
+int OBV;
+int SAR;
+int RSI;
+int RVI;
+int MovingSD;
+int STOCOSC;
+
+//Array Declarations
+MqlRates HistoricalData[];
+double AD_array[];
+double ADX_main[];
+double ADX_plus_DI[];
+double ADX_minus_DI[];
+double ATR_array[];
+double BB_main[];
+double BB_up[];
+double BB_down[];
+double CCI_array[];
+double ChaikinOsc_array[];
+double SMA_array[];
+double EMA_array[];
+double DEMA_array[];
+double TEMA_array[];
+double MOM_array[];
+double MFI_array[];
+double MACD_main[];
+double MACD_signal[];
+double OBV_array[];
+double SAR_array[];
+double RSI_array[];
+double RVI_main[];
+double RVI_signal[];
+double MovingSD_array[];
+double STOCOSC_main[];
+double STOCOSC_signal[];
+
+
+int OnInit()
+  {
+   //Setting arrays as series
+   ArraySetAsSeries(HistoricalData, true);
+   ArraySetAsSeries(AD_array, true);
+   ArraySetAsSeries(ADX_main, true);
+   ArraySetAsSeries(ADX_plus_DI, true);
+   ArraySetAsSeries(ADX_minus_DI, true);
+   ArraySetAsSeries(ATR_array, true);
+   ArraySetAsSeries(CCI_array, true);
+   ArraySetAsSeries(ChaikinOsc_array, true);
+   ArraySetAsSeries(SMA_array, true);
+   ArraySetAsSeries(EMA_array, true);
+   ArraySetAsSeries(DEMA_array, true);
+   ArraySetAsSeries(TEMA_array, true);
+   ArraySetAsSeries(MOM_array, true);
+   ArraySetAsSeries(MFI_array, true);
+   ArraySetAsSeries(MACD_main, true);
+   ArraySetAsSeries(MACD_signal, true);
+   ArraySetAsSeries(OBV_array, true);
+   ArraySetAsSeries(SAR_array, true);
+   ArraySetAsSeries(RSI_array, true);
+   ArraySetAsSeries(RVI_main, true);
+   ArraySetAsSeries(RVI_signal, true);
+   ArraySetAsSeries(MovingSD_array, true);
+   ArraySetAsSeries(STOCOSC_main, true);
+   ArraySetAsSeries(STOCOSC_signal, true);
+ 
+   
+   AD = iAD(_Symbol, Period(), VOLUME_REAL);
+   ADX = iADX(_Symbol, Period(), 14);
+   ATR = iATR(_Symbol, Period(), 14);
+   BB = iBands(_Symbol, Period(), 20, 0, 2, PRICE_CLOSE);
+   CCI = iCCI(_Symbol, Period(), 14, PRICE_CLOSE);
+   ChaikinOsc = iChaikin(_Symbol, Period(), 21, 14, MODE_EMA, VOLUME_REAL);
+   SMA = iMA(_Symbol, Period(), 14, 0, MODE_SMA, PRICE_CLOSE);
+   EMA = iMA(_Symbol, Period(), 14, 0, MODE_EMA, PRICE_CLOSE);
+   DEMA = iDEMA(_Symbol, Period(), 14, 0, PRICE_CLOSE);
+   TEMA = iTEMA(_Symbol, Period(), 14, 0, PRICE_CLOSE);
+   MOM = iMomentum(_Symbol, Period(), 13, PRICE_CLOSE);
+   MFI = iMFI(_Symbol, Period(), 14, VOLUME_REAL);
+   MACD = iMACD(_Symbol, Period(), 12, 26, 9, PRICE_CLOSE);
+   OBV = iOBV(_Symbol, Period(), VOLUME_REAL);
+   SAR = iSAR(_Symbol, Period(), .2, .2);
+   RSI = iRSI(_Symbol, Period(), 14, PRICE_CLOSE);
+   RVI = iRVI(_Symbol, Period(), 14);
+   MovingSD = iStdDev(_Symbol, Period(), 14, 0, MODE_SMA, PRICE_CLOSE);
+   STOCOSC = iStochastic(_Symbol, Period(), 5, 3, 3, MODE_SMA, STO_LOWHIGH);
+  
+   int filehandle=FileOpen(Symbol()+ StringSubstr(EnumToString(Period()), 6) + "_Indicators"+".txt",FILE_READ|FILE_WRITE|FILE_ANSI|FILE_CSV, ",");
+   FileWrite(filehandle, "Date", "Accumulation Distribution Line", "ADX Main", "ADX Plus DI", "ADX Minus DI", "Average True Range",
+                         "Bollinger Bands Center", "Bollinger Bands Upper","Bollinger Bands Lower", "Commodity Channel Index",
+                         "Chaikin Oscillator", "Simple Moving Average", "Exponentially Weighted Moving Average", "Double Exponentially Weighted Moving Average", 
+                         "Triple Exponentially Weighted Moving Average", "Momentum Oscillator", "Money Flow Index", "MACD Main Line", "MACD Signal Line", 
+                         "OBV", "Parabolic SAR", "RSI", "RVI Main", "RVI Signal", "Moving Std Dev",
+                         "Stochastic Osc Main Line", "Stochastic Osc Signal");
+   FileClose(filehandle);
+   return(INIT_SUCCEEDED);
+  }
+
+void OnDeinit(const int reason)
+  {
+  
+  }
+
+void OnTick()
+  {
+      //Copy Buffers
+      CopyRates(_Symbol, Period(), 0, 2, HistoricalData);
+      CopyBuffer(AD, 0, 0, 2, AD_array);
+      CopyBuffer(ADX, 0, 0, 2, ADX_main);
+      CopyBuffer(ADX, 1, 0, 2, ADX_plus_DI);
+      CopyBuffer(ADX, 2, 0, 2, ADX_minus_DI);
+      CopyBuffer(ATR, 0, 0, 2, ATR_array);
+      CopyBuffer(BB, 0, 0, 2, BB_main);
+      CopyBuffer(BB, 1, 0, 2, BB_up);
+      CopyBuffer(BB, 2, 0, 2, BB_down);
+      CopyBuffer(CCI, 0, 0, 2, CCI_array);
+      CopyBuffer(ChaikinOsc, 0, 0, 2, ChaikinOsc_array);
+      CopyBuffer(SMA, 0, 0, 2, SMA_array);
+      CopyBuffer(EMA, 0, 0, 2, EMA_array);
+      CopyBuffer(DEMA, 0, 0, 2, DEMA_array);
+      CopyBuffer(TEMA, 0, 0, 2, TEMA_array);
+      CopyBuffer(MOM, 0, 0, 2, MOM_array);
+      CopyBuffer(MFI, 0, 0, 2, MFI_array);
+      CopyBuffer(MACD, 0, 0, 2, MACD_main);
+      CopyBuffer(MACD, 1, 0, 2, MACD_signal);
+      CopyBuffer(OBV, 0, 0, 2, OBV_array);
+      CopyBuffer(SAR, 0, 0, 2, SAR_array);
+      CopyBuffer(RSI, 0, 0, 2, RSI_array);
+      CopyBuffer(RVI, 0, 0, 2, RVI_main);
+      CopyBuffer(RVI, 1, 0, 2, RVI_signal);
+      CopyBuffer(MovingSD, 0, 0, 2, MovingSD_array);
+      CopyBuffer(STOCOSC, 0, 0, 2, STOCOSC_main);
+      CopyBuffer(STOCOSC, 1, 0, 2, STOCOSC_signal);
+      
+      static datetime TimeLastCheck;
+      datetime CurrentTimeCandle;
+      CurrentTimeCandle = HistoricalData[0].time;
+      
+      if(CurrentTimeCandle != TimeLastCheck) 
+      {
+
+         TimeLastCheck = CurrentTimeCandle;
+         int filehandle=FileOpen(Symbol() + StringSubstr(EnumToString(Period()), 6) + "_Indicators"+".txt",FILE_READ|FILE_WRITE|FILE_ANSI|FILE_CSV, ",");
+        
+         if(filehandle!=INVALID_HANDLE)
+         {
+            FileSeek(filehandle,0,SEEK_END);
+            FileWrite(filehandle, HistoricalData[1].time, AD_array[1], ADX_main[1], ADX_plus_DI[1], ADX_minus_DI[1], ATR_array[1], 
+                                  BB_main[1], BB_up[1], BB_down[1], CCI_array[1],
+                                  ChaikinOsc_array[1], SMA_array[1], EMA_array[1], 
+                                  DEMA_array[1], TEMA_array[1], MOM_array[1], MFI_array[1], MACD_main[1], MACD_signal[1], 
+                                  OBV_array[1], SAR_array[1], RSI_array[1], RVI_main[1], RVI_signal[1], MovingSD_array[1], 
+                                  STOCOSC_main[1], STOCOSC_signal[1]);
+            FileClose(filehandle);
+         }
+         else  Print("Operation FileOpen failed, error ",GetLastError());
+     }
+  }
+
